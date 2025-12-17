@@ -16,6 +16,26 @@ class App {
     this.ExpressApp.set('view engine', 'ejs');
     this.ExpressApp.set('views', path.join(__dirname, '../view'));
     
+    // Return a Proxy to auto-forward missing methods to ExpressApp --Ai generated suggestion
+    return new Proxy(this, {
+      get(target, prop) {
+        // If property exists on our custom class, use it
+        if (prop in target) {
+          return target[prop];
+        }
+        
+        // Otherwise, forward to ExpressApp
+        const expressProp = target.ExpressApp[prop];
+        
+        // If it's a function, bind it to ExpressApp
+        if (typeof expressProp === 'function') {
+          return expressProp.bind(target.ExpressApp);
+        }
+        
+        // Otherwise return the property value
+        return expressProp;
+      }
+    });
   }
 
   use(path, middlewareOrRouter) {
@@ -53,6 +73,21 @@ class App {
     this.ExpressApp.post(path,...handlers);
     this._register("post", path, handlers);
   }
+   put(path, ...handlers) {
+    this.ExpressApp.put(path, ...handlers);
+    this._register("put", path, handlers);
+  }
+
+  patch(path, ...handlers) {
+    this.ExpressApp.patch(path, ...handlers);
+    this._register("patch", path, handlers);
+  }
+
+  delete(path, ...handlers) {
+    this.ExpressApp.delete(path, ...handlers);
+    this._register("delete", path, handlers);
+  }
+
 
   _register(method, path, handlers) {
     const finalPath = this.basePath + normalize(path);
@@ -107,3 +142,4 @@ function normalize(path) {
 }
 
 export default App;
+
