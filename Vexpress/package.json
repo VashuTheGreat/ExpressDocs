@@ -1,0 +1,27 @@
+{
+  "name": "@vashuthegreat/vexpress",
+  "version": "1.0.1",
+  "description": "A auto Docs maker for express app",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "scripts": {
+    "test": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VashuTheGreat/ExpressDocs.git"
+  },
+  "author": "VashuTheGreat",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VashuTheGreat/ExpressDocs/issues"
+  },
+  "homepage": "https://github.com/VashuTheGreat/ExpressDocs#readme",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.2.1"
+  }
+}

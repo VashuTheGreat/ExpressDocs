@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Documentation</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    header {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      color: #667eea;
+      font-size: 2.5rem;
+    }
+
+    header p {
+      color: #666;
+      margin-top: 0.5rem;
+    }
+
+    .endpoint {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .endpoint:hover {
+      transform: translateY(-2px);
+    }
+
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .method {
+      min-width: 80px;
+      padding: 0.5rem 1rem;
+      text-align: center;
+      border-radius: 6px;
+      font-weight: bold;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .method.get { background: #e3f2fd; color: #1976d2; }
+    .method.post { background: #e8f5e9; color: #388e3c; }
+    .method.put { background: #fff3e0; color: #f57c00; }
+    .method.patch { background: #fce4ec; color: #c2185b; }
+    .method.delete { background: #ffebee; color: #d32f2f; }
+    .method.use { background: #f3e5f5; color: #7b1fa2; }
+
+    .path {
+      flex: 1;
+      font-family: monospace;
+      font-size: 1.05rem;
+      color: #333;
+    }
+
+    .summary {
+      margin-top: 0.5rem;
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    .details {
+      display: none;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+    }
+
+    .endpoint.expanded .details {
+      display: block;
+    }
+
+    .section {
+      margin-bottom: 1.5rem;
+    }
+
+    .section h4 {
+      color: #667eea;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    .param-box {
+      background: #f8f9fa;
+      border-left: 3px solid #667eea;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+    }
+
+    .param-item {
+      font-family: monospace;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .param-name {
+      color: #667eea;
+      font-weight: bold;
+    }
+
+    .param-type {
+      color: #999;
+      font-size: 0.85rem;
+    }
+
+    .try-section {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+    }
+
+    .try-section h4 {
+      color: #667eea;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    .input-group {
+      margin-bottom: 1rem;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+      color: #555;
+      font-weight: 500;
+    }
+
+    .input-group input,
+    .input-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      font-family: monospace;
+      font-size: 0.9rem;
+      transition: border-color 0.2s;
+    }
+
+    .input-group input:focus,
+    .input-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .input-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .execute-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .execute-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .response-section {
+      margin-top: 1.5rem;
+      display: none;
+    }
+
+    .response-section.show {
+      display: block;
+    }
+
+    .response-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .status-badge {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .status-badge.success {
+      background: #e8f5e9;
+      color: #388e3c;
+    }
+
+    .status-badge.error {
+      background: #ffebee;
+      color: #d32f2f;
+    }
+
+    .response-body {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 1.25rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .toggle-icon {
+      margin-left: auto;
+      transition: transform 0.3s ease;
+      font-size: 1.2rem;
+    }
+
+    .endpoint.expanded .toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    .required {
+      color: #d32f2f;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>🚀 API Documentation</h1>
+      <p>Interactive documentation - Test your APIs directly from the browser</p>
+    </header>
+
+    <div id="endpoints"></div>
+  </div>
+
+  <script>
+    let routes = [];
+
+    async function loadRoutes() {
+      try {
+        const res = await fetch('<%= openapiPath %>');
+        routes = await res.json();
+        render();
+      } catch (err) {
+        console.error('Failed to load routes:', err);
+      }
+    }
+
+    function render() {
+      const container = document.getElementById('endpoints');
+      container.innerHTML = routes.map((r, i) => createEndpoint(r, i)).join('');
+    }
+
+    function createEndpoint(route, index) {
+      const meta = route.meta || {};
+      return `
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(${index})">
+            <span class="method ${route.method}">${route.method}</span>
+            <span class="path">${route.path}</span>
+            <span class="toggle-icon">▼</span>
+          </div>
+          ${meta.summary ? `<div class="summary">${meta.summary}</div>` : ''}
+          
+          <div class="details">
+            ${renderParamInfo('Path Parameters', meta.params)}
+            ${renderParamInfo('Query Parameters', meta.query)}
+            ${renderParamInfo('Request Body', meta.body)}
+            ${meta.response ? `<div class="section"><h4>Response</h4><div class="param-box">${meta.response}</div></div>` : ''}
+            
+            <div class="try-section">
+              <h4>🧪 Try it out</h4>
+              <div id="inputs-${index}"></div>
+              <button class="execute-btn" onclick="executeRequest(${index}, event)">Execute</button>
+              <div id="response-${index}" class="response-section"></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderParamInfo(title, params) {
+      if (!params) return '';
+      
+      // Handle object format {name: value} - auto-detect type
+      if (typeof params === 'object' && !Array.isArray(params)) {
+        const items = Object.entries(params).map(([name, value]) => {
+          const type = typeof value; // Auto-detect type from value
+          return `
+            <div class="param-item">
+              <span class="param-name">${name}</span>
+              <span class="param-type">(${type})</span>
+              <span style="color: #999; margin-left: 0.5rem; font-size: 0.85rem;">example: ${JSON.stringify(value)}</span>
+            </div>
+          `;
+        }).join('');
+        
+        return `
+          <div class="section">
+            <h4>${title}</h4>
+            <div class="param-box">${items}</div>
+          </div>
+        `;
+      }
+      
+      // Handle array format (backward compatibility)
+      if (params.length === 0) return '';
+      
+      const items = params.map(p => {
+        if (typeof p === 'string') {
+          return `<div class="param-item"><span class="param-name">${p}</span> <span class="param-type">(string)</span></div>`;
+        }
+        return `
+          <div class="param-item">
+            <span class="param-name">${p.name}</span>
+            <span class="param-type">(${p.type || 'string'})</span>
+            ${p.required ? '<span class="required"> *required</span>' : ''}
+            ${p.description ? `<div style="color: #666; margin-top: 0.25rem; font-size: 0.85rem;">${p.description}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="section">
+          <h4>${title}</h4>
+          <div class="param-box">${items}</div>
+        </div>
+      `;
+    }
+
+    function toggleEndpoint(index) {
+      const endpoints = document.querySelectorAll('.endpoint');
+      const clicked = endpoints[index];
+      const wasExpanded = clicked.classList.contains('expanded');
+
+      // Close all
+      endpoints.forEach(e => e.classList.remove('expanded'));
+
+      // Open clicked if it wasn't expanded
+      if (!wasExpanded) {
+        clicked.classList.add('expanded');
+        renderInputFields(index);
+      }
+    }
+
+    function renderInputFields(index) {
+      const route = routes[index];
+      const meta = route.meta || {};
+      const container = document.getElementById(`inputs-${index}`);
+      
+      let html = '';
+
+      // Path parameters - handle object format with example values
+      if (meta.params) {
+        if (typeof meta.params === 'object' && !Array.isArray(meta.params)) {
+          // Object format: {id: "123", userId: "user456"}
+          Object.entries(meta.params).forEach(([name, exampleValue]) => {
+            const type = typeof exampleValue;
+            html += `
+              <div class="input-group">
+                <label>${name} <span style="color: #999;">(${type})</span></label>
+                <input type="text" 
+                       data-type="param" 
+                       data-name="${name}" 
+                       value="${exampleValue}"
+                       placeholder="Enter ${name}">
+              </div>
+            `;
+          });
+        } else if (meta.params.length > 0) {
+          // Array format (backward compatibility)
+          meta.params.forEach(param => {
+            const name = typeof param === 'string' ? param : param.name;
+            const desc = typeof param === 'object' ? param.description : '';
+            const required = typeof param === 'object' ? param.required : false;
+            
+            html += `
+              <div class="input-group">
+                <label>${name} (path parameter)${required ? ' <span class="required">*</span>' : ''}</label>
+                <input type="text" 
+                       data-type="param" 
+                       data-name="${name}" 
+                       placeholder="${desc || 'Enter ' + name}">
+              </div>
+            `;
+          });
+        }
+      }
+
+      // Query parameters - handle object format with example values
+      if (meta.query) {
+        if (typeof meta.query === 'object' && !Array.isArray(meta.query)) {
+          // Object format: {page: 1, limit: 10}
+          Object.entries(meta.query).forEach(([name, exampleValue]) => {
+            const type = typeof exampleValue;
+            html += `
+              <div class="input-group">
+                <label>${name} <span style="color: #999;">(${type})</span></label>
+                <input type="text" 
+                       data-type="query" 
+                       data-name="${name}" 
+                       value="${exampleValue}"
+                       placeholder="Enter ${name}">
+              </div>
+            `;
+          });
+        } else if (meta.query.length > 0) {
+          // Array format (backward compatibility)
+          meta.query.forEach(param => {
+            const name = typeof param === 'string' ? param : param.name;
+            const desc = typeof param === 'object' ? param.description : '';
+            const required = typeof param === 'object' ? param.required : false;
+            
+            html += `
+              <div class="input-group">
+                <label>${name} (query parameter)${required ? ' <span class="required">*</span>' : ''}</label>
+                <input type="text" 
+                       data-type="query" 
+                       data-name="${name}" 
+                       placeholder="${desc || 'Enter ' + name}">
+              </div>
+            `;
+          });
+        }
+      }
+
+      // Body parameters - handle object format with example values
+      if (meta.body) {
+        if (typeof meta.body === 'object' && !Array.isArray(meta.body)) {
+          // Object format: {name: "Sample", price: 99.99}
+          // Pre-fill with actual example values
+          const bodyJSON = JSON.stringify(meta.body, null, 2);
+
+          html += `
+            <div class="input-group">
+              <label>Request Body (JSON)</label>
+              <textarea data-type="body" placeholder="Enter JSON body">${bodyJSON}</textarea>
+            </div>
+          `;
+        } else if (meta.body.length > 0) {
+          // Array format (backward compatibility)
+          const bodyFields = meta.body.map(b => {
+            const name = typeof b === 'string' ? b : b.name;
+            return `  "${name}": ""`;
+          }).join(',\n');
+
+          html += `
+            <div class="input-group">
+              <label>Request Body (JSON)</label>
+              <textarea data-type="body" placeholder="Enter JSON body">{\n${bodyFields}\n}</textarea>
+            </div>
+          `;
+        }
+      }
+
+      container.innerHTML = html;
+    }
+
+    async function executeRequest(index, event) {
+      event.stopPropagation();
+
+      const route = routes[index];
+      const inputsContainer = document.getElementById(`inputs-${index}`);
+      const responseContainer = document.getElementById(`response-${index}`);
+
+      // Build URL
+      let url = route.path;
+      const queryParams = [];
+
+      // Get all inputs
+      inputsContainer.querySelectorAll('input, textarea').forEach(input => {
+        const type = input.dataset.type;
+        const name = input.dataset.name;
+        const value = input.value.trim();
+
+        if (!value) return;
+
+        if (type === 'param') {
+          // Replace path parameter
+          url = url.replace(`:${name}`, value);
+        } else if (type === 'query') {
+          // Add query parameter
+          queryParams.push(`${name}=${encodeURIComponent(value)}`);
+        }
+      });
+
+      // Add query string
+      if (queryParams.length > 0) {
+        url += '?' + queryParams.join('&');
+      }
+
+      // Get body
+      const bodyInput = inputsContainer.querySelector('[data-type="body"]');
+      let body = null;
+      if (bodyInput && bodyInput.value.trim()) {
+        try {
+          body = JSON.parse(bodyInput.value);
+        } catch (e) {
+          responseContainer.innerHTML = `
+            <div class="response-header">
+              <span class="status-badge error">Invalid JSON</span>
+            </div>
+            <div class="response-body">Error: ${e.message}</div>
+          `;
+          responseContainer.classList.add('show');
+          return;
+        }
+      }
+
+      // Show loading
+      responseContainer.innerHTML = `
+        <div class="response-header">
+          <span class="status-badge">Loading...</span>
+        </div>
+      `;
+      responseContainer.classList.add('show');
+
+      // Make request
+      try {
+        const options = {
+          method: route.method.toUpperCase(),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        };
+
+        if (body) {
+          options.body = JSON.stringify(body);
+        }
+
+        const response = await fetch(url, options);
+        const data = await response.json();
+
+        responseContainer.innerHTML = `
+          <div class="response-header">
+            <span class="status-badge ${response.ok ? 'success' : 'error'}">
+              ${response.status} ${response.statusText}
+            </span>
+          </div>
+          <div class="response-body">${JSON.stringify(data, null, 2)}</div>
+        `;
+      } catch (error) {
+        responseContainer.innerHTML = `
+          <div class="response-header">
+            <span class="status-badge error">Error</span>
+          </div>
+          <div class="response-body">${error.message}</div>
+        `;
+      }
+    }
+
+    // Load routes on page load
+    loadRoutes();
+  </script>
+</body>
+</html>
