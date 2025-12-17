@@ -15,9 +15,16 @@ class App {
     
     this.ExpressApp.set('view engine', 'ejs');
     this.ExpressApp.set('views', path.join(__dirname, '../view'));
+    
   }
 
   use(path, middlewareOrRouter) {
+    // handling app.use(middleware)
+    if(typeof path === "function"){
+        this.ExpressApp.use(path)
+        return;
+      
+    }
     if (middlewareOrRouter instanceof Router) {
       middlewareOrRouter.routes = middlewareOrRouter.routes.map(route => {
         return {
@@ -58,6 +65,18 @@ class App {
       meta: lastHandler._config || {}
     });
   }
+
+  static json(...args) {
+  return express.json(...args);
+}
+
+static urlencoded(...args) {
+  return express.urlencoded(...args);
+}
+
+static static(...args) {
+  return express.static(...args);
+}
 
 
   listen(PORT,callback){
