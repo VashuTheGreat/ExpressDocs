@@ -322,7 +322,31 @@
     }
 
     function renderParamInfo(title, params) {
-      if (!params || params.length === 0) return '';
+      if (!params) return '';
+      
+      // Handle object format {name: value} - auto-detect type
+      if (typeof params === 'object' && !Array.isArray(params)) {
+        const items = Object.entries(params).map(([name, value]) => {
+          const type = typeof value; // Auto-detect type from value
+          return `
+            <div class="param-item">
+              <span class="param-name">${name}</span>
+              <span class="param-type">(${type})</span>
+              <span style="color: #999; margin-left: 0.5rem; font-size: 0.85rem;">example: ${JSON.stringify(value)}</span>
+            </div>
+          `;
+        }).join('');
+        
+        return `
+          <div class="section">
+            <h4>${title}</h4>
+            <div class="param-box">${items}</div>
+          </div>
+        `;
+      }
+      
+      // Handle array format (backward compatibility)
+      if (params.length === 0) return '';
       
       const items = params.map(p => {
         if (typeof p === 'string') {
@@ -368,57 +392,107 @@
       
       let html = '';
 
-      // Path parameters
-      if (meta.params && meta.params.length > 0) {
-        meta.params.forEach(param => {
-          const name = typeof param === 'string' ? param : param.name;
-          const desc = typeof param === 'object' ? param.description : '';
-          const required = typeof param === 'object' ? param.required : false;
-          
-          html += `
-            <div class="input-group">
-              <label>${name} (path parameter)${required ? ' <span class="required">*</span>' : ''}</label>
-              <input type="text" 
-                     data-type="param" 
-                     data-name="${name}" 
-                     placeholder="${desc || 'Enter ' + name}">
-            </div>
-          `;
-        });
+      // Path parameters - handle object format with example values
+      if (meta.params) {
+        if (typeof meta.params === 'object' && !Array.isArray(meta.params)) {
+          // Object format: {id: "123", userId: "user456"}
+          Object.entries(meta.params).forEach(([name, exampleValue]) => {
+            const type = typeof exampleValue;
+            html += `
+              <div class="input-group">
+                <label>${name} <span style="color: #999;">(${type})</span></label>
+                <input type="text" 
+                       data-type="param" 
+                       data-name="${name}" 
+                       value="${exampleValue}"
+                       placeholder="Enter ${name}">
+              </div>
+            `;
+          });
+        } else if (meta.params.length > 0) {
+          // Array format (backward compatibility)
+          meta.params.forEach(param => {
+            const name = typeof param === 'string' ? param : param.name;
+            const desc = typeof param === 'object' ? param.description : '';
+            const required = typeof param === 'object' ? param.required : false;
+            
+            html += `
+              <div class="input-group">
+                <label>${name} (path parameter)${required ? ' <span class="required">*</span>' : ''}</label>
+                <input type="text" 
+                       data-type="param" 
+                       data-name="${name}" 
+                       placeholder="${desc || 'Enter ' + name}">
+              </div>
+            `;
+          });
+        }
       }
 
-      // Query parameters
-      if (meta.query && meta.query.length > 0) {
-        meta.query.forEach(param => {
-          const name = typeof param === 'string' ? param : param.name;
-          const desc = typeof param === 'object' ? param.description : '';
-          const required = typeof param === 'object' ? param.required : false;
-          
-          html += `
-            <div class="input-group">
-              <label>${name} (query parameter)${required ? ' <span class="required">*</span>' : ''}</label>
-              <input type="text" 
-                     data-type="query" 
-                     data-name="${name}" 
-                     placeholder="${desc || 'Enter ' + name}">
-            </div>
-          `;
-        });
+      // Query parameters - handle object format with example values
+      if (meta.query) {
+        if (typeof meta.query === 'object' && !Array.isArray(meta.query)) {
+          // Object format: {page: 1, limit: 10}
+          Object.entries(meta.query).forEach(([name, exampleValue]) => {
+            const type = typeof exampleValue;
+            html += `
+              <div class="input-group">
+                <label>${name} <span style="color: #999;">(${type})</span></label>
+                <input type="text" 
+                       data-type="query" 
+                       data-name="${name}" 
+                       value="${exampleValue}"
+                       placeholder="Enter ${name}">
+              </div>
+            `;
+          });
+        } else if (meta.query.length > 0) {
+          // Array format (backward compatibility)
+          meta.query.forEach(param => {
+            const name = typeof param === 'string' ? param : param.name;
+            const desc = typeof param === 'object' ? param.description : '';
+            const required = typeof param === 'object' ? param.required : false;
+            
+            html += `
+              <div class="input-group">
+                <label>${name} (query parameter)${required ? ' <span class="required">*</span>' : ''}</label>
+                <input type="text" 
+                       data-type="query" 
+                       data-name="${name}" 
+                       placeholder="${desc || 'Enter ' + name}">
+              </div>
+            `;
+          });
+        }
       }
 
-      // Body parameters
-      if (meta.body && meta.body.length > 0) {
-        const bodyFields = meta.body.map(b => {
-          const name = typeof b === 'string' ? b : b.name;
-          return `  "${name}": ""`;
-        }).join(',\n');
+      // Body parameters - handle object format with example values
+      if (meta.body) {
+        if (typeof meta.body === 'object' && !Array.isArray(meta.body)) {
+          // Object format: {name: "Sample", price: 99.99}
+          // Pre-fill with actual example values
+          const bodyJSON = JSON.stringify(meta.body, null, 2);
 
-        html += `
-          <div class="input-group">
-            <label>Request Body (JSON)</label>
-            <textarea data-type="body" placeholder="Enter JSON body">{\n${bodyFields}\n}</textarea>
-          </div>
-        `;
+          html += `
+            <div class="input-group">
+              <label>Request Body (JSON)</label>
+              <textarea data-type="body" placeholder="Enter JSON body">${bodyJSON}</textarea>
+            </div>
+          `;
+        } else if (meta.body.length > 0) {
+          // Array format (backward compatibility)
+          const bodyFields = meta.body.map(b => {
+            const name = typeof b === 'string' ? b : b.name;
+            return `  "${name}": ""`;
+          }).join(',\n');
+
+          html += `
+            <div class="input-group">
+              <label>Request Body (JSON)</label>
+              <textarea data-type="body" placeholder="Enter JSON body">{\n${bodyFields}\n}</textarea>
+            </div>
+          `;
+        }
       }
 
       container.innerHTML = html;
